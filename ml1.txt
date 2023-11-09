@@ -1,0 +1,59 @@
+1st 
+
+import numpy as np 
+import pandas as pd 
+
+
+import pandas as pd
+
+df = pd.read_csv('Salary.csv')
+
+print(df.to_string()) 
+
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+
+df.head()
+
+X = df.iloc[:, :-1].values    # Features => Years of experience => Independent Variable
+y = df.iloc[:, -1].values     # Target => Salary => Dependent Variable
+X
+
+
+y
+
+from sklearn.model_selection import train_test_split
+import sklearn.metrics as sm
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+predictions = model.predict(X_test)
+predictions
+
+y_test
+
+import seaborn as sns
+sns.distplot(predictions-y_test)
+
+plt.scatter(X_train, y_train, color='red')
+plt.plot(X_train, model.predict(X_train))
+
+
+r_sq = model.score(X_train, y_train)
+print('coefficient of determination:', r_sq)
+
+print('intercept:', model.intercept_)
+print('slope:', model.coef_) 
+
+y_pred = model.predict(X_train)
+print('Predicted response:', y_pred, sep='\n')
+
+print('y='+str(float(model.coef_))+'X+'+str(float(model.intercept_)))

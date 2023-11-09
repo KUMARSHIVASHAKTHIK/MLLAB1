@@ -1,0 +1,97 @@
+
+5th
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("adult.csv")
+
+df.head()
+df.columns
+df.shape
+
+df.isin(['?']).sum()
+
+df['workclass'] = df['workclass'].replace('?', np.nan)
+df['occupation'] = df['occupation'].replace('?', np.nan)
+df['native-country'] = df['native-country'].replace('?', np.nan)
+
+df.isin(['?']).sum()
+
+df.isnull().sum()
+
+df.dropna(how='any', inplace=True)
+
+print(f"There are {df.duplicated().sum()} duplicate values")
+
+df = df.drop_duplicates()
+
+df.shape
+
+df.columns
+
+df.drop(['fnlwgt','educational-num','marital-status','relationship', 'race',], axis = 1, inplace = True)
+
+df.columns
+
+X = df.loc[:,['age', 'workclass', 'education', 'occupation', 'gender', 'capital-gain',
+       'capital-loss', 'hours-per-week', 'native-country']]
+y = df.loc[:,'income']
+
+
+X.head()
+
+y.head()
+
+from sklearn.preprocessing import LabelEncoder
+y = LabelEncoder().fit_transform(y)
+y = pd.DataFrame(y)
+y.head()
+
+numeric_features = X.select_dtypes('number')
+categorical_features = X.select_dtypes('object')
+categorical_features
+
+
+numeric_features
+
+
+converted_categorical_features = pd.get_dummies(categorical_features)
+converted_categorical_features.shape
+
+all_features = [converted_categorical_features, numeric_features]
+newX = pd.concat(all_features,axis=1, join='inner')
+newX.shape
+
+
+newX.columns
+
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(newX, y, test_size=0.33, random_state=42)
+
+# Load Decision Tree Classifier, max_depth = 5 and fit it with X-train and y-train
+from sklearn.tree import DecisionTreeClassifier
+clf = DecisionTreeClassifier(max_depth=5)
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+y_test.shape
+
+y_pred.shape
+
+predictions_df = pd.DataFrame()
+predictions_df['precdicted_salary_class'] = y_pred
+predictions_df['actual_salary_class'] = y_test[0].values
+predictions_df
+
+from sklearn.metrics import accuracy_score
+print(accuracy_score(y_pred,y_test))
+
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+plt.figure(figsize=(14,14))
+plot_tree(clf, fontsize=10, filled=True)
+plt.title("Decision tree trained on the selected features")
+plt.show()
